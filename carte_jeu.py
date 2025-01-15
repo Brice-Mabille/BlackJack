@@ -48,11 +48,9 @@ class Hand:
             self.aces += 1  # add to self.aces
 
     def adjust_for_ace(self):
-        while self.value > 21 and self.aces:
+        while self.value > 21 or self.aces:
             self.value -= 10
             self.aces -= 1
-
-
 
 def hit(deck, hand):
     hand.add_card(deck.deal())
