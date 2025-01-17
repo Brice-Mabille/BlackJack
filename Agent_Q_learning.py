@@ -1,10 +1,11 @@
 import random
-import carte_jeu
-from carte_jeu import Deck, Card, Hand, hit, hit_or_stand, show_some, show_all, player_busts, player_wins, dealer_busts, dealer_wins, push
+import numpy as np 
+import Jeu_regles
+from Jeu_regles import Deck, Card, Hand, hit, hit_or_stand, show_some, show_all, player_busts, player_wins, dealer_busts, dealer_wins, push
 
 class QLearningBlackjackAgent:
         # Configuration des hyperparamètres du Q-Learning
-    ALPHA = 0.2  # Taux d'apprentissage
+    ALPHA = 0.1  # Taux d'apprentissage
     GAMMA = 0.95  # Facteur de décroissance de la récompense future
     EPSILON = 1.0  # Équilibre exploration/exploitation (initialement 100% exploration)
     EPSILON_DECAY = 0.9  # Facteur de décroissance d'EPSILON
@@ -50,11 +51,12 @@ class QLearningBlackjackAgent:
         # Mise à jour de la valeur Q
         self.q_table[state][action_idx] = current_q + QLearningBlackjackAgent.ALPHA * (reward + QLearningBlackjackAgent.GAMMA * max_next_q - current_q)
 
-
 # Fonction pour l'entraînement de l'agent
 def train_q_learning_agent(episodes):
 
     agent = QLearningBlackjackAgent()
+    scores = []  # Liste pour stocker les scores moyens
+    final_hands = []  # Liste pour stocker les mains finales moyennes
 
     for episode in range(episodes):
         # Initialiser un nouvel épisode
@@ -73,6 +75,9 @@ def train_q_learning_agent(episodes):
         has_ace = player_hand.aces > 0
         dealer_card = Card.values[dealer_hand.cards[0].rank]
         state = agent.get_state(player_hand.value, has_ace, dealer_card)
+        
+        total_reward = 0
+        actions_taken = []
 
         # Jouer le tour du joueur
         while player_hand.value < 21:
@@ -93,6 +98,7 @@ def train_q_learning_agent(episodes):
             agent.update_q_value(state, action, reward, next_state)
 
             state = next_state
+            total_reward += reward
 
         # Jouer le tour du dealer si le joueur ne "bust" pas
         if player_hand.value <= 21:
@@ -100,20 +106,34 @@ def train_q_learning_agent(episodes):
                 hit(deck, dealer_hand)
 
             # Déterminer le résultat
+            # Récompenses Basiques
             if dealer_hand.value > 21 or player_hand.value > dealer_hand.value:
                 reward = 1  # Victoire
             elif player_hand.value < dealer_hand.value:
                 reward = -1  # Défaite
             else:
                 reward = 0  # Égalité
+                
+            # Récompenses Optimisées 
+            """if player_hand.value == 21:
+                reward = 5  # Récompense élevée pour obtenir 21
+            elif player_hand.value < 21:
+                reward = 0.1 * player_hand.value / 21  # Récompense progressive
+            elif player_hand.value < dealer_hand.value:
+                reward = -1 # Défaite
+            else:
+                reward = 0.2 #Egaluté"""
 
             agent.update_q_value(state, action, reward, state)
+            total_reward += reward
 
         # Réduire EPSILON pour favoriser l'exploitation
         EPSILON = max(QLearningBlackjackAgent.EPSILON * QLearningBlackjackAgent.EPSILON_DECAY, QLearningBlackjackAgent.EPSILON_MIN)
+        # Enregistrer les statistiques
+        scores.append(total_reward)
+        final_hands.append(player_hand.value)
 
         # Afficher la progression
-        #if (episode + 1) % 1000 == 0:
         print(f"Episode {episode + 1}/{episodes} completed. Récompense : {reward}")
 
-    return agent
+    return agent, scores, final_hands

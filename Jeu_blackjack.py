@@ -1,7 +1,7 @@
 import random
 import time
-import carte_jeu
-from carte_jeu import Deck, Card, Hand, hit, hit_or_stand, show_some, show_all, player_busts, player_wins, dealer_busts, dealer_wins, push
+import Jeu_regles
+from Jeu_regles import Deck, Card, Hand, hit, hit_or_stand, show_some, show_all, player_busts, player_wins, dealer_busts, dealer_wins, push
 
 # GAMEPLAY!
 

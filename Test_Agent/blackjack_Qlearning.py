@@ -1,16 +1,17 @@
 import random
 import time
 import numpy as np
-import carte_jeu
-import Q_learning
+import Jeu_regles
+import Agent_Q_learning
 
-from carte_jeu import Deck, Card, Hand, hit, hit_or_stand, show_some, show_all, player_busts, player_wins, dealer_busts, dealer_wins, push
-from Q_learning import train_q_learning_agent
+from Jeu_regles import Deck, Card, Hand, hit, hit_or_stand, show_some, show_all, player_busts, player_wins, dealer_busts, dealer_wins, push
+from Agent_Q_learning import train_q_learning_agent
 
 playing = True
 
 # Entraînement de l'agent
-trained_agent = train_q_learning_agent(100)
+trained_agent, scores, final_hands = train_q_learning_agent(episodes=100)
+
 print(f"")
 
 # Exemple d'utilisation de l'agent
@@ -38,7 +39,7 @@ for _ in range(5):
     state = trained_agent.get_state(player_hand.value, has_ace, dealer_card)
 
     while player_hand.value <= 21:
-        action = trained_agent.choose_action(state)
+        action = trained_agent.q_learning_choose_action(state)
  
         if action == 'h':
             hit(deck, player_hand)

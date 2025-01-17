@@ -8,15 +8,15 @@
 import random
 import time
 import numpy as np
-import carte_jeu
-import simple_agent
-import random_agent
-import Q_learning
+import Jeu_regles
+import Agent_simple
+import Agent_random
+import Agent_Q_learning
 
-from carte_jeu import Deck, Card, Hand, hit, hit_or_stand, show_some, show_all, player_busts, player_wins, dealer_busts, dealer_wins, push
-from simple_agent import agent_turn
-from random_agent import random_agent_turn
-from Q_learning import train_q_learning_agent
+from Jeu_regles import Deck, Card, Hand, hit, hit_or_stand, show_some, show_all, player_busts, player_wins, dealer_busts, dealer_wins, push
+from Agent_simple import agent_turn
+from Agent_random import random_agent_turn
+from Agent_Q_learning import train_q_learning_agent
 
 playing = True
 
